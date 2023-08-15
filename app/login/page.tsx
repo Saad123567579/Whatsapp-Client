@@ -5,8 +5,11 @@ import Image from "next/image";
 import { FcGoogle } from "react-icons/fc";
 import { firebaseAuth } from "../../Utils/firebaseConfig";
 import { useRouter } from 'next/navigation';
-
+import { useStateProvider } from 'context/stateContext/ ';
+import cases from "../../context/Constants";
 const page = () => {
+  const [state,dispatch] = useStateProvider();
+  console.log(state);
   const [disable, Setdisable] = useState(false);
   const router = useRouter();
   const handleLogin = async () => {
@@ -25,7 +28,12 @@ const page = () => {
     const data = await response.json();
     console.log(data);
     Setdisable(false);
-    if (data.status == false) { Setdisable(true); router.push('/onboarding'); }
+    if (data.status == false) { Setdisable(true);
+      dispatch({
+        type: cases.SET_NEW_USER_INFO,
+        newuser: { name: obj.name, email:obj.email,image:obj.image }
+      });
+      router.push('/onboarding'); }
   }
   return (
     <div className="flex items-center justify-center w-full h-screen bg-[url('https://media.giphy.com/media/DRinNvjCXc5Iexx0CH/giphy.gif')] bg-cover bg-center bg-no-repeat">
