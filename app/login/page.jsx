@@ -5,11 +5,10 @@ import Image from "next/image";
 import { FcGoogle } from "react-icons/fc";
 import { firebaseAuth } from "../../Utils/firebaseConfig";
 import { useRouter } from 'next/navigation';
-import { useStateProvider } from 'context/stateContext/ ';
-import cases from "../../context/Constants";
+import {useSelector,useDispatch} from "react-redux";
+import { updateNewUser } from 'redux/userSlice/ ';
 const page = () => {
-  const [state,dispatch] = useStateProvider();
-  console.log(state);
+  const dispatch = useDispatch();
   const [disable, Setdisable] = useState(false);
   const router = useRouter();
   const handleLogin = async () => {
@@ -29,11 +28,9 @@ const page = () => {
     console.log(data);
     Setdisable(false);
     if (data.status == false) { Setdisable(true);
-      dispatch({
-        type: cases.SET_NEW_USER_INFO,
-        newuser: { name: obj.name, email:obj.email,image:obj.image }
-      });
-      router.push('/onboarding'); }
+      dispatch(updateNewUser(obj));
+      router.push('/onboarding');
+     }
   }
   return (
     <div className="flex items-center justify-center w-full h-screen bg-[url('https://media.giphy.com/media/DRinNvjCXc5Iexx0CH/giphy.gif')] bg-cover bg-center bg-no-repeat">

@@ -2,13 +2,15 @@
 import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import { StateProvider } from '../context/stateContext';
-import reducer,{initialState} from "../context/stateReducer";
+
+import { Provider } from "react-redux";
+import { store } from "../redux/store";
+
 const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'MyWhatsapp',
   description:'My Great Whatsapp',
-  
+
 }
 
 export default function RootLayout({
@@ -17,11 +19,11 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <StateProvider initialState={initialState} reducer={reducer}>
+    <Provider store={store}>
       <html lang="en">
-       
-      <body className={inter.className}>{children}</body>
-    </html>
-    </StateProvider>
+
+        <body className={inter.className}>{children}</body>
+      </html>
+    </Provider>
   )
 }
