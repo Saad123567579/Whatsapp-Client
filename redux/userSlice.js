@@ -3,30 +3,30 @@
 
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 const initialState = {
-
+    user:null,
     newuser: null,
     status:"idle"
 
 };
 
 
-// export const getUserAsync = createAsyncThunk(
-//     'user/getUser',
-//     async () => {
-//         let url = "https://stubebackend.vercel.app/auth/getuser";
-//         const response = await fetch(url, {
-//             method: 'GET',
-//             credentials: 'include',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//                 // Add any additional headers if needed
-//             },
+export const getUserAsync = createAsyncThunk(
+    'user/getUser',
+    async () => {
+        let url = "http://localhost:4000/user/getuser";
+        const response = await fetch(url, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                // Add any additional headers if needed
+            },
 
-//         });
-//         const d = await response.json();
-//         return d;
-//     }
-// );
+        });
+        const d = await response.json();
+        return d;
+    }
+);
 
 
 
@@ -41,19 +41,23 @@ export const userSlice = createSlice({
             state.newuser = {...state.newuser,...action.payload}
         }
     },
-    // extraReducers: (builder) => {
-    //     builder
-    //         .addCase(signupUserAsync.pending, (state) => {
-    //             state.status = 'loading';
-    //         })
-    //         .addCase(signupUserAsync.fulfilled, (state, action) => {
-
-    //         })
+    extraReducers: (builder) => {
+        builder
+            .addCase(getUserAsync.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(getUserAsync.fulfilled, (state, action) => {
+                state.status = 'fulfilled';
+                if(action.payload=="Token Not Found" || action.payload=="Invalid Token" || action.payload=='False' || action.payload=="Internal Server Error") return;
+                else{
+                    state.user = action.payload;
+                }
+            })
             
 
 
 
-    // },
+    },
 
 
 });

@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react'
+import React, { useState,useEffect} from 'react'
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import Image from "next/image";
 import { FcGoogle } from "react-icons/fc";
@@ -7,7 +7,16 @@ import { firebaseAuth } from "../Utils/firebaseConfig";
 import { useRouter } from 'next/navigation';
 import {useSelector,useDispatch} from "react-redux";
 import { updateNewUser } from 'redux/userSlice/ ';
+import {getUserAsync} from "../redux/userSlice";
 const page = () => {
+  const user = useSelector((state)=>state.user.user);
+  useEffect(() => {
+    const fetchUser = async() => {
+      await dispatch(getUserAsync());
+    }
+   fetchUser();
+  }, [user])
+  
   const dispatch = useDispatch();
   const [disable, Setdisable] = useState(false);
   const router = useRouter();
@@ -19,6 +28,7 @@ const page = () => {
 
     const response = await fetch('http://localhost:4000/user/check', {
       method: 'POST',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json'
       },
@@ -27,6 +37,7 @@ const page = () => {
     const data = await response.json();
     console.log(data);
     Setdisable(false);
+    await dispatch(getUserAsync());
     if (data.status == false) { Setdisable(true);
       dispatch(updateNewUser(obj));
       router.push('/onboarding');

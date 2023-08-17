@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { updateNewUser } from 'redux/userSlice/ ';
 import { useRouter } from 'next/navigation';
 import {toast} from "react-toastify";
+import {getUserAsync} from "../../redux/userSlice";
 
 const page = () => {
   const router = useRouter();
@@ -26,11 +27,13 @@ const page = () => {
     let url = "http://localhost:4000/user/createuser";
     const response = await fetch(url,{
       method:"POST",
+      credentials: 'include',
       headers:{'Content-Type':"application/json"},
       body:JSON.stringify(obj)
       
     })
     const d = await response.json();
+    await dispatch(getUserAsync());
     if(d.message=='Internal server error') return toast.error("Internal Server Error. Try Again");
     else {
       toast.success("Congratulations for signing up");
