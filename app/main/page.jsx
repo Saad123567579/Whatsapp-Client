@@ -16,12 +16,12 @@ const page = () => {
     fetchUser();
   }, []);
   return (
-    <div className='flex w-full h-screen bg-black'>
-      <div className='w-1/4 h-full '>
+    <div className='flex w-full h-screen '>
+      <div className='w-1/4 h-screen overflow-auto '>
       <Contact />
-      
+   
       </div>
-      <div className='w-3/4 h-full bg-slate-900'>
+      <div className='w-3/4 h-screen bg-slate-900'>
         <Message />
       </div>
       

@@ -1,11 +1,11 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { IoMdArrowRoundBack } from 'react-icons/io';
-import { toggleCurrent, setCIUser } from '../../redux/userSlice'; // Adjust the path based on your project structure
+import { toggleCurrent, setCIUser } from '../../redux/userSlice';
+
 
 const Allcontacts = () => {
   const allcontacts = useSelector((state) => state?.user?.allContacts);
-
   const dispatch = useDispatch();
 
   return (
@@ -16,11 +16,11 @@ const Allcontacts = () => {
         </div>
       </div>
 
-      <div className='w-full h-full overflow-auto flex'>
+      <div className='w-full flex-grow overflow-auto'> {/* Only the outermost container should have overflow-auto */}
         {allcontacts === null ? (
           <div>Loading...</div>
         ) : (
-          <div className='flex-col w-full'>
+          <div className='flex-col w-full '>
             {allcontacts.map((contact) => (
               <div className='flex flex-col p-2 w-full' key={contact.letter}>
                 <h1 className='font-semibold text-2xl p-2'>{contact.letter}</h1>
