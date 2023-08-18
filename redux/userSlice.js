@@ -5,7 +5,10 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 const initialState = {
     user:null,
     newuser: null,
-    status:"idle"
+    status:"idle",
+    show:"current",
+    allContacts:null,
+    ciUser:null
 
 };
 
@@ -14,6 +17,25 @@ export const getUserAsync = createAsyncThunk(
     'user/getUser',
     async () => {
         let url = "http://localhost:4000/user/getuser";
+        const response = await fetch(url, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                // Add any additional headers if needed
+            },
+
+        });
+        const d = await response.json();
+        console.log("response" ,d);
+        return d;
+    }
+);
+
+export const getallContactsAsync = createAsyncThunk(
+    'user/getallContacts',
+    async () => {
+        let url = "http://localhost:4000/user/getalluser";
         const response = await fetch(url, {
             method: 'GET',
             credentials: 'include',
@@ -40,6 +62,15 @@ export const userSlice = createSlice({
         updateNewUser:(state,action) => {
             console.log("UpdatenewUser");
             state.newuser = {...state.newuser,...action.payload}
+        },
+        toggleContact:(state)=>{
+            state.show = "contact";
+        },
+        toggleCurrent:(state)=>{
+            state.show = "current";
+        },
+        setCIUser:(state,action) => {
+            state.ciUser = action.payload
         }
     },
     extraReducers: (builder) => {
@@ -54,6 +85,17 @@ export const userSlice = createSlice({
                     state.user = action.payload;
                 }
             })
+            .addCase(getallContactsAsync.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(getallContactsAsync.fulfilled, (state, action) => {
+                state.status = 'fulfilled';
+                if(action.payload=="Internal Server Error") return;
+                else{
+                    state.allContacts = action.payload;
+                }
+            })
+            
             
 
 
@@ -63,5 +105,5 @@ export const userSlice = createSlice({
 
 });
 
-export const { updateNewUser } = userSlice.actions;
+export const { updateNewUser,toggleContact,toggleCurrent,setCIUser } = userSlice.actions;
 export default userSlice.reducer;

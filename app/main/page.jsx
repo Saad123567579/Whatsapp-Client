@@ -3,7 +3,7 @@ import React from 'react'
 import Contact from "./Contact";
 import Message from "./Message";
 import { useDispatch,useSelector } from 'react-redux';
-import { getUserAsync } from 'redux/userSlice/ ';
+import { getUserAsync,getallContactsAsync } from 'redux/userSlice/ ';
 import { useEffect } from 'react';
 const page = () => {
   const dispatch = useDispatch();
@@ -11,6 +11,7 @@ const page = () => {
   useEffect(() => {
     const fetchUser = async () => {
       await dispatch(getUserAsync());
+      await dispatch(getallContactsAsync());
     };
     fetchUser();
   }, []);
