@@ -8,8 +8,16 @@ import {toast} from "react-toastify";
 import {getUserAsync} from "../../redux/userSlice";
 
 const page = () => {
-  const router = useRouter();
   const dispatch = useDispatch();
+  const user = useSelector((state)=>state.user.user);
+  const router = useRouter();
+  useEffect(() => {
+    const fetchUser = async () => {
+      await dispatch(getUserAsync());
+    };
+    fetchUser();
+  }, []);
+  
   const {
     register,
     handleSubmit,

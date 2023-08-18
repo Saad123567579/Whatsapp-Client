@@ -9,15 +9,15 @@ import {useSelector,useDispatch} from "react-redux";
 import { updateNewUser } from 'redux/userSlice/ ';
 import {getUserAsync} from "../redux/userSlice";
 const page = () => {
+  const dispatch = useDispatch();
   const user = useSelector((state)=>state.user.user);
   useEffect(() => {
-    const fetchUser = async() => {
-      await dispatch(getUserAsync());
-    }
-   fetchUser();
-  }, [user])
-  
-  const dispatch = useDispatch();
+    const fetchUser = async () => {
+      const d = await dispatch(getUserAsync());
+      console.log("data",d);
+    };
+    fetchUser();
+  }, []);
   const [disable, Setdisable] = useState(false);
   const router = useRouter();
   const handleLogin = async () => {
@@ -35,7 +35,7 @@ const page = () => {
       body: JSON.stringify(obj)
     })
     const data = await response.json();
-    console.log(data);
+    
     Setdisable(false);
     await dispatch(getUserAsync());
     if (data.status == false) { Setdisable(true);

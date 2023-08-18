@@ -24,6 +24,7 @@ export const getUserAsync = createAsyncThunk(
 
         });
         const d = await response.json();
+        console.log("response" ,d);
         return d;
     }
 );

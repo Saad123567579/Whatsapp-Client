@@ -1,3 +1,4 @@
+'use client'
 import React from 'react'
 import { AiFillMessage } from "react-icons/ai";
 import { BiDotsVerticalRounded } from "react-icons/bi";
