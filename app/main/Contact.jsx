@@ -11,7 +11,7 @@ const Contact = () => {
     const dispatch = useDispatch();
     const user = useSelector((state) => state?.user?.user);
     const show = useSelector((state)=>state?.user?.show);
-    console.log(show);
+ 
 
     return (
         <div className='w-full h-full bg-white'>

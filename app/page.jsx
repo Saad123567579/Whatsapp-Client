@@ -14,7 +14,7 @@ const page = () => {
   useEffect(() => {
     const fetchUser = async () => {
       const d = await dispatch(getUserAsync());
-      console.log("data",d);
+  
     };
     fetchUser();
   }, []);

@@ -1,27 +1,59 @@
 'use client'
-import React ,{useEffect} from "react";
+import React, { useEffect } from "react";
 import { FiPhoneCall } from "react-icons/fi";
 import { BsCameraVideo } from "react-icons/bs";
 import { BiDotsVerticalRounded } from "react-icons/bi";
 import { BiSearch } from "react-icons/bi";
 import { useSelector, useDispatch } from "react-redux";
 import { setCIUser } from "redux/userSlice/ ";
-import{BsFillEmojiSmileFill} from "react-icons/bs";
-import {AiOutlinePaperClip,AiOutlineSend} from "react-icons/ai";
-
+import { TiTickOutline, TiTick } from "react-icons/ti";
+import { BsFillEmojiSmileFill } from "react-icons/bs";
+import { AiOutlinePaperClip, AiOutlineSend } from "react-icons/ai";
+import { toast } from "react-toastify";
+import { setMsgLog } from "../../redux/userSlice";
 const Message = () => {
   const dispatch = useDispatch();
   const ciUser = useSelector((state) => state?.user?.ciUser);
-  const handleSend = () =>{
+  const cUser = useSelector((state) => state?.user?.user);
+  const messages = useSelector((state) => state?.user?.msglog);
+  const handleSend = async () => {
     let text = document.getElementById('t').value;
-    if(text=="") alert("Type something before sending ");
-    else alert(`${text}`);
+    if (text == "") return toast.error("Type something before sending ");
+    const obj = { message: text, from: cUser.id, to: ciUser.id };
+    const response = await fetch('http://localhost:4000/message/add', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(obj)
+    })
+    const data = await response.json();
+    if (data == "Internal Server Error") return toast.error("Internal Server Error");
+    document.getElementById('t').value = "";
+    return toast.success("Sent");
   }
-  
+  useEffect(() => {
+    let element = document.getElementById('t');
+    if (!element) return;
+    else { document.getElementById('t').value = ""; return; }
+  }, [ciUser])
+  useEffect(() => {
+    if (!ciUser) return;
+    const fetchMessage = async () => {
+      const response = await fetch(`http://localhost:4000/message/get/${cUser.id}/${ciUser.id}`);
+      const data = await response.json();
+      dispatch(setMsgLog(data));
+    }
+    fetchMessage();
+  }, [ciUser])
+
+
+
   return (
-    <div className="h-full w-full">
+    <div className="h-full w-full ">
       {ciUser !== null ? (
-        <div className="flex flex-col h-screen">
+        <div className="flex flex-col h-full">
           <div className="w-full h-16 bg-whatsapp flex">
             <img className="w-12 h-12 m-2 rounded-full" src={ciUser?.image} alt="img" />
             <div className="flex-col justify-end p-2 h-full">
@@ -43,9 +75,41 @@ const Message = () => {
               </div>
             </div>
           </div>
-          <div className="w-full h-full bg-mywhite flex-grow flex flex-col justify-end items-end">
+          <div className="w-full h-full bg-mywhite  flex flex-col justify-end items-end">
+            <div className=" w-full h-full max-h-full overflow-y-auto flex-grow">
+              {
+                messages && messages.length ? (
+                  messages.map((message) => ( 
+                    message?.senderId === cUser.id ? (<div className={`items-center h-8 flex mt-10 justify-end border-box `}>
+                      <h1 className="bg-green-400 rounded-xl flex-row-reverse justify-end p-2 m-8  ">{message.message}
+                        {message.status === "seen" ?
+                          (<div className="text-2xl ml-4  cursor-pointer"><TiTick /></div>)
+                          :
+                          (<div className="text-2xl ml-4  cursor-pointer"><TiTickOutline /></div>)}
+                      </h1>
+
+                    </div>) : (
+                      <div className={`items-center h-8 flex m-2 mt-4 p-2 justify-start  `}>
+                        <h1 className="bg-slate-400 rounded-xl flex  p-2">{message.message}
+
+                        </h1>
+
+                      </div>
+                    )
+
+
+                  ))
+                ) :
+
+
+                  (<div className="w-full h-full bg-mywhite flex justify-center items-center">
+                    <h1 className="text-4xl font-semibold">Start A Conversation Now</h1>
+                  </div>)
+
+              }
+            </div>
             <div className=" w-full h-14 flex items-center border-t-2">
-            <div className="text-2xl ml-4  cursor-pointer">
+              <div className="text-2xl ml-4  cursor-pointer">
                 <BsFillEmojiSmileFill />
               </div>
               <div className="text-2xl ml-4  cursor-pointer">

@@ -8,7 +8,8 @@ const initialState = {
     status:"idle",
     show:"current",
     allContacts:null,
-    ciUser:null
+    ciUser:null,
+    msglog:[]
 
 };
 
@@ -27,7 +28,7 @@ export const getUserAsync = createAsyncThunk(
 
         });
         const d = await response.json();
-        console.log("response" ,d);
+        
         return d;
     }
 );
@@ -46,7 +47,7 @@ export const getallContactsAsync = createAsyncThunk(
 
         });
         const d = await response.json();
-        console.log("response" ,d);
+      
         return d;
     }
 );
@@ -60,7 +61,7 @@ export const userSlice = createSlice({
     reducers: {
         
         updateNewUser:(state,action) => {
-            console.log("UpdatenewUser");
+            
             state.newuser = {...state.newuser,...action.payload}
         },
         toggleContact:(state)=>{
@@ -71,6 +72,9 @@ export const userSlice = createSlice({
         },
         setCIUser:(state,action) => {
             state.ciUser = action.payload
+        },
+        setMsgLog:(state,action) => {
+            state.msglog = [...action.payload]
         }
     },
     extraReducers: (builder) => {
@@ -105,5 +109,5 @@ export const userSlice = createSlice({
 
 });
 
-export const { updateNewUser,toggleContact,toggleCurrent,setCIUser } = userSlice.actions;
+export const { updateNewUser,toggleContact,toggleCurrent,setCIUser,setMsgLog } = userSlice.actions;
 export default userSlice.reducer;
