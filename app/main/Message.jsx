@@ -1,5 +1,5 @@
 'use client'
-import React from "react";
+import React ,{useEffect} from "react";
 import { FiPhoneCall } from "react-icons/fi";
 import { BsCameraVideo } from "react-icons/bs";
 import { BiDotsVerticalRounded } from "react-icons/bi";
@@ -8,9 +8,15 @@ import { useSelector, useDispatch } from "react-redux";
 import { setCIUser } from "redux/userSlice/ ";
 import{BsFillEmojiSmileFill} from "react-icons/bs";
 import {AiOutlinePaperClip,AiOutlineSend} from "react-icons/ai";
+
 const Message = () => {
   const dispatch = useDispatch();
   const ciUser = useSelector((state) => state?.user?.ciUser);
+  const handleSend = () =>{
+    let text = document.getElementById('t').value;
+    if(text=="") alert("Type something before sending ");
+    else alert(`${text}`);
+  }
   
   return (
     <div className="h-full w-full">
@@ -39,14 +45,14 @@ const Message = () => {
           </div>
           <div className="w-full h-full bg-mywhite flex-grow flex flex-col justify-end items-end">
             <div className=" w-full h-14 flex items-center border-t-2">
-            <div className="text-2xl ml-4">
+            <div className="text-2xl ml-4  cursor-pointer">
                 <BsFillEmojiSmileFill />
               </div>
-              <div className="text-2xl ml-4">
+              <div className="text-2xl ml-4  cursor-pointer">
                 <AiOutlinePaperClip />
               </div>
-              <div className="ml-2 w-4/5 "><input className="p-2 rounded-l-full rounded-r-full w-full" type="text" /></div>
-              <div className="text-2xl ml-4">
+              <div className="ml-2 w-4/5 "><input className="p-2 rounded-l-full rounded-r-full w-full" id="t" type="text" /></div>
+              <div className="text-2xl ml-4 cursor-pointer" onClick={handleSend}>
                 <AiOutlineSend />
               </div>
 

@@ -43,6 +43,8 @@ const page = () => {
       router.push('/onboarding');
      }
      else{
+      
+        
       router.push('/main');
      }
   }

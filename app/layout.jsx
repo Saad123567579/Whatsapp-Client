@@ -1,14 +1,13 @@
-"use client"
+'use client'
 import './globals.css';
-0
+
 import { Inter } from 'next/font/google';
 import { Provider } from 'react-redux';
 import { store } from '../redux/store';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import React, { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { getUserAsync } from '../redux/userSlice'; // Remove the space here
+import React from 'react';
+
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
