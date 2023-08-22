@@ -36,7 +36,7 @@ const page = () => {
     })
     const data = await response.json();
     
-    Setdisable(false);
+    
     await dispatch(getUserAsync());
     if (data.status == false) { Setdisable(true);
       dispatch(updateNewUser(obj));
@@ -44,7 +44,7 @@ const page = () => {
      }
      else{
       
-        
+      Setdisable(true)
       router.push('/main');
      }
   }

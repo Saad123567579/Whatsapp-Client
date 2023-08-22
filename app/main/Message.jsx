@@ -53,6 +53,7 @@ const Message = () => {
     if (!ciUser) return;
     const fetchMessage = async () => {
       const response = await fetch(`http://localhost:4000/message/get/${cUser.id}/${ciUser.id}`);
+      socket?.current?.emit("update-msg-log",ciUser?.id);
       const data = await response.json();
       dispatch(setMsgLog(data));
     }
@@ -103,15 +104,16 @@ const Message = () => {
     };
   }, [ciUser, cUser]); // Make sure to include cUser as a dependency
   
+
   socket?.current?.on("getOnlineusers",async(users)=>{
     if (!ciUser) return;
     // console.log("the users are ", users);
   
       // Check if the current user is online in the received list of users
       if (users.includes(ciUser.id)) {
-        const response = await fetch(`http://localhost:4000/message/get/${cUser?.id}/${ciUser?.id}`);
-      const data = await response.json();
-      dispatch(setMsgLog(data));
+      //   const response = await fetch(`http://localhost:4000/message/get/${cUser?.id}/${ciUser?.id}`);
+      // const data = await response.json();
+      // dispatch(setMsgLog(data));
         setStatus("online");
       } else {
         setStatus("offline");
@@ -123,20 +125,35 @@ const Message = () => {
   })
   useEffect(() => {
     if (socket.current) {
-      const receiveMsgHandler = async (message) => {
+      const receiveMsgHandler = async () => {
+        if(!ciUser) return ;
         // await dispatch(updateMsglog(message));
         const response = await fetch(`http://localhost:4000/message/get/${cUser?.id}/${ciUser?.id}`);
-      const data = await response.json();
-      dispatch(setMsgLog(data));
+        const data = await response.json();
+        await dispatch(setMsgLog(data));
       };
   
-      socket.current.on("receive-msg", receiveMsgHandler);
+      socket?.current?.on("receive-msg", receiveMsgHandler);
   
       return () => {
         socket.current.off("receive-msg", receiveMsgHandler);
       };
     }
   }, []);
+
+  useEffect(() => {
+  const updateMessages = async() => {
+    if(!ciUser) return ;
+    const response = await fetch(`http://localhost:4000/message/get/${cUser?.id}/${ciUser?.id}`);
+        const data = await response.json();
+        await dispatch(setMsgLog(data));
+  }
+  socket?.current?.on("update-your-msg-log",updateMessages);
+    return () => {
+      socket?.current?.on("update-your-msg-log",updateMessages);
+    }
+  }, [])
+  
   
   const handleTextChange = () => {
     if(!ciUser) return;
@@ -240,7 +257,3 @@ const Message = () => {
 };
 
 export default Message;
-
-
-
-
