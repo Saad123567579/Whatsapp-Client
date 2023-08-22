@@ -40,6 +40,7 @@ const Message = () => {
     })
     const data = await response.json();
     if (data == "Internal Server Error") return toast.error("Internal Server Error");
+    console.log("A message was created now off to send-msg");
     document.getElementById('t').value = "";
     socket?.current?.emit("send-msg",data);
     return toast.success("Sent");
@@ -110,7 +111,7 @@ const Message = () => {
     // console.log("the users are ", users);
   
       // Check if the current user is online in the received list of users
-      if (users.includes(ciUser.id)) {
+      if (users?.includes(ciUser.id)) {
       //   const response = await fetch(`http://localhost:4000/message/get/${cUser?.id}/${ciUser?.id}`);
       // const data = await response.json();
       // dispatch(setMsgLog(data));
@@ -124,12 +125,15 @@ const Message = () => {
     setStatus("typing...");
   })
   useEffect(() => {
-    if (socket.current) {
+    if(!ciUser){console.log("returning ");return} 
+    
       const receiveMsgHandler = async () => {
-        if(!ciUser) return ;
+        
+        console.log("I am now in receuve message");
         // await dispatch(updateMsglog(message));
         const response = await fetch(`http://localhost:4000/message/get/${cUser?.id}/${ciUser?.id}`);
         const data = await response.json();
+        console.log("the new data is ",data);
         await dispatch(setMsgLog(data));
       };
   
@@ -138,21 +142,27 @@ const Message = () => {
       return () => {
         socket.current.off("receive-msg", receiveMsgHandler);
       };
-    }
-  }, []);
-
+    
+  }, [ciUser, cUser]);
+  
+    
+      
+    
+  
   useEffect(() => {
+    if(!ciUser) return ;
   const updateMessages = async() => {
     if(!ciUser) return ;
     const response = await fetch(`http://localhost:4000/message/get/${cUser?.id}/${ciUser?.id}`);
         const data = await response.json();
         await dispatch(setMsgLog(data));
+        console.log("i just got updated");
   }
   socket?.current?.on("update-your-msg-log",updateMessages);
     return () => {
-      socket?.current?.on("update-your-msg-log",updateMessages);
+      socket?.current?.off("update-your-msg-log",updateMessages);
     }
-  }, [])
+  }, [ciUser, cUser])
   
   
   const handleTextChange = () => {
