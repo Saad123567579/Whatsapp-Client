@@ -9,13 +9,15 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emoji-mart/data": "^1.1.2",
     "@reduxjs/toolkit": "^1.9.5",
     "@types/node": "20.5.0",
     "@types/react": "18.2.20",
     "@types/react-dom": "18.2.7",
     "autoprefixer": "10.4.15",
     "dotenv": "^16.3.1",
-    "emoji-picker-react": "^4.4.10",
+    "emoji-mart": "^5.5.2",
+    "emoji-picker-react": "^4.4.11",
     "eslint": "8.47.0",
     "eslint-config-next": "13.4.16",
     "firebase": "^10.1.0",

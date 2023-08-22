@@ -12,8 +12,12 @@ import { AiOutlinePaperClip, AiOutlineSend } from "react-icons/ai";
 import { toast } from "react-toastify";
 import { setMsgLog , setSocket , updateMsglog } from "../../redux/userSlice";
 import io from 'socket.io-client';
+import Picker from "emoji-picker-react";
+
+
 
 const Message = () => {
+  const [picker,setPicker] = useState(false);
   const [status,setStatus] = useState("offline");
   const socket = useRef();
   const [socketEvent,setsocketEvent] = useState(false);
@@ -22,6 +26,7 @@ const Message = () => {
   const cUser = useSelector((state) => state?.user?.user);
   const messages = useSelector((state) => state?.user?.msglog);
   const handleSend = async () => {
+    setPicker(false);
     let text = document.getElementById('t').value;
     if (text == "") return toast.error("Type something before sending ");
     const obj = { message: text, from: cUser.id, to: ciUser.id };
@@ -36,7 +41,7 @@ const Message = () => {
     const data = await response.json();
     if (data == "Internal Server Error") return toast.error("Internal Server Error");
     document.getElementById('t').value = "";
-    socket.current.emit("send-msg",obj);
+    socket?.current?.emit("send-msg",data);
     return toast.success("Sent");
   }
   useEffect(() => {
@@ -98,36 +103,54 @@ const Message = () => {
     };
   }, [ciUser, cUser]); // Make sure to include cUser as a dependency
   
-
-  socket?.current?.on("getOnlineusers",(users)=>{
+  socket?.current?.on("getOnlineusers",async(users)=>{
     if (!ciUser) return;
     // console.log("the users are ", users);
   
       // Check if the current user is online in the received list of users
       if (users.includes(ciUser.id)) {
-        // console.log("online");
+        const response = await fetch(`http://localhost:4000/message/get/${cUser?.id}/${ciUser?.id}`);
+      const data = await response.json();
+      dispatch(setMsgLog(data));
         setStatus("online");
       } else {
         setStatus("offline");
         // console.log("offline");
       }
-    
-   
   });
   socket?.current?.on("typing",()=>{
     setStatus("typing...");
   })
+  useEffect(() => {
+    if (socket.current) {
+      const receiveMsgHandler = async (message) => {
+        // await dispatch(updateMsglog(message));
+        const response = await fetch(`http://localhost:4000/message/get/${cUser?.id}/${ciUser?.id}`);
+      const data = await response.json();
+      dispatch(setMsgLog(data));
+      };
+  
+      socket.current.on("receive-msg", receiveMsgHandler);
+  
+      return () => {
+        socket.current.off("receive-msg", receiveMsgHandler);
+      };
+    }
+  }, []);
+  
   const handleTextChange = () => {
     if(!ciUser) return;
-    socket?.current?.emit("typing",{"from":cUser.id,"to":ciUser.id});
+    socket?.current?.emit("typing",{"from":cUser.id,"to":ciUser.id}); }
 
-   
-  }
-
-  
+  const onEmojiClick = ( emojiObject) => {
+      console.log(emojiObject);
+      const updatedMessage = document.getElementById('t').value + emojiObject.emoji;
+      document.getElementById('t').value = updatedMessage;
+    };
+    
   
   return (
-    <div className="h-full w-full ">
+    <div className="h-full w-full  ">
       {ciUser !== null ? (
         <div className="flex flex-col h-full">
           <div className="w-full h-16 bg-whatsapp flex">
@@ -151,7 +174,7 @@ const Message = () => {
               </div>
             </div>
           </div>
-          <div className="w-full h-full bg-mywhite  flex flex-col justify-end items-end">
+          <div className="w-full h-5/6 bg-mywhite  flex flex-col justify-end items-end">
             <div className=" w-full h-full max-h-full overflow-y-auto flex-grow">
               {
                 messages && messages.length ? (
@@ -184,9 +207,17 @@ const Message = () => {
 
               }
             </div>
-            <div className=" w-full h-14 flex items-center border-t-2">
+            <div className=" w-full h-1/6 flex items-center mt-4 border-t-2">
               <div className="text-2xl ml-4  cursor-pointer">
-                <BsFillEmojiSmileFill />
+                <BsFillEmojiSmileFill onClick={()=>setPicker(!picker)} />
+                {picker && (
+    <div className="absolute bottom-14 left-90 z-10">
+      <Picker
+        pickerStyle={{ width: "100%", position: "static" }} // Use inline style to match Tailwind classes
+        onEmojiClick={onEmojiClick}
+      />
+    </div>
+  )}
               </div>
               <div className="text-2xl ml-4  cursor-pointer">
                 <AiOutlinePaperClip />
