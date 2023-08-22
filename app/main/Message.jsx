@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect } from "react";
+import React, {useRef , useState, useEffect } from "react";
 import { FiPhoneCall } from "react-icons/fi";
 import { BsCameraVideo } from "react-icons/bs";
 import { BiDotsVerticalRounded } from "react-icons/bi";
@@ -10,8 +10,13 @@ import { TiTickOutline, TiTick } from "react-icons/ti";
 import { BsFillEmojiSmileFill } from "react-icons/bs";
 import { AiOutlinePaperClip, AiOutlineSend } from "react-icons/ai";
 import { toast } from "react-toastify";
-import { setMsgLog } from "../../redux/userSlice";
+import { setMsgLog , setSocket , updateMsglog } from "../../redux/userSlice";
+import io from 'socket.io-client';
+
 const Message = () => {
+  const [status,setStatus] = useState("offline");
+  const socket = useRef();
+  const [socketEvent,setsocketEvent] = useState(false);
   const dispatch = useDispatch();
   const ciUser = useSelector((state) => state?.user?.ciUser);
   const cUser = useSelector((state) => state?.user?.user);
@@ -31,6 +36,7 @@ const Message = () => {
     const data = await response.json();
     if (data == "Internal Server Error") return toast.error("Internal Server Error");
     document.getElementById('t').value = "";
+    socket.current.emit("send-msg",obj);
     return toast.success("Sent");
   }
   useEffect(() => {
@@ -47,9 +53,79 @@ const Message = () => {
     }
     fetchMessage();
   }, [ciUser])
+  useEffect(() => {
+    if(!cUser) return ;
+    const fdata = async() => {
+       socket.current = io('http://localhost:4000');
+       await dispatch(setSocket(socket?.current?.id));
+      socket.current.emit("adduser",cUser?.id);
+      return () => {
+        socket.current.emit("disconnect");
+      }
+     
+    }
+   fdata(); 
+  }, [cUser])
 
+  useEffect(() => {
+    if (!ciUser) return;
+  
+    // Emit an event to get the current users
+    socket.current.emit("getcurrentusers", cUser?.id);
+  
+    // Define the event handler for receiving current users
+    const handleCurrentUsers = (users) => {
+      if (!ciUser) return;
+  
+      // console.log("the users are ", users);
+  
+      // Check if the current user is online in the received list of users
+      if (users.includes(ciUser.id)) {
+        // console.log("online");
+        setStatus("online");
+      } else {
+        setStatus("offline");
+        // console.log("offline");
+      }
+    };
+  
+    // Subscribe to the "herecurrentusers" event
+    socket?.current?.on("herecurrentusers", handleCurrentUsers);
+  
+    // Clean up by unsubscribing from the "herecurrentusers" event
+    return () => {
+      socket?.current?.off("herecurrentusers", handleCurrentUsers);
+    };
+  }, [ciUser, cUser]); // Make sure to include cUser as a dependency
+  
 
+  socket?.current?.on("getOnlineusers",(users)=>{
+    if (!ciUser) return;
+    // console.log("the users are ", users);
+  
+      // Check if the current user is online in the received list of users
+      if (users.includes(ciUser.id)) {
+        // console.log("online");
+        setStatus("online");
+      } else {
+        setStatus("offline");
+        // console.log("offline");
+      }
+    
+   
+  });
+  socket?.current?.on("typing",()=>{
+    setStatus("typing...");
+  })
+  const handleTextChange = () => {
+    if(!ciUser) return;
+    socket?.current?.emit("typing",{"from":cUser.id,"to":ciUser.id});
 
+   
+  }
+
+  
+  
   return (
     <div className="h-full w-full ">
       {ciUser !== null ? (
@@ -57,8 +133,8 @@ const Message = () => {
           <div className="w-full h-16 bg-whatsapp flex">
             <img className="w-12 h-12 m-2 rounded-full" src={ciUser?.image} alt="img" />
             <div className="flex-col justify-end p-2 h-full">
-              <h1 className="font-semibold text-xl">{ciUser?.name}</h1>
-              <p>online</p>
+              <h1 className="font-semibold text-lg">{ciUser?.name?.split(' ')[0]}</h1>
+              <p>{status}</p>
             </div>
             <div className="flex w-full justify-end items-center">
               <div className="text-2xl ml-4">
@@ -115,7 +191,7 @@ const Message = () => {
               <div className="text-2xl ml-4  cursor-pointer">
                 <AiOutlinePaperClip />
               </div>
-              <div className="ml-2 w-4/5 "><input className="p-2 rounded-l-full rounded-r-full w-full" id="t" type="text" /></div>
+              <div className="ml-2 w-4/5 "><input onChange={handleTextChange} className="p-2 rounded-l-full rounded-r-full w-full" id="t" type="text" /></div>
               <div className="text-2xl ml-4 cursor-pointer" onClick={handleSend}>
                 <AiOutlineSend />
               </div>
