@@ -10,7 +10,8 @@ const initialState = {
     allContacts:null,
     ciUser:null,
     msglog:[],
-    socket:null
+    socket:null,
+    current:null,
 
 };
 
@@ -82,6 +83,12 @@ export const userSlice = createSlice({
         },
         updateMsglog:(state,action) => {
             state.msglog.push(action.payload)
+        },
+        updateCurrent:(state,action) => {
+            state.current = action.payload;
+        },
+        setcinull:(state) => {
+            state.ciUser = null;
         }
     },
     extraReducers: (builder) => {
@@ -116,5 +123,5 @@ export const userSlice = createSlice({
 
 });
 
-export const { updateNewUser,toggleContact,toggleCurrent,setCIUser,setMsgLog,setSocket ,updateMsglog} = userSlice.actions;
+export const { updateNewUser,toggleContact,toggleCurrent,setCIUser,setMsgLog,setSocket ,updateMsglog,updateCurrent,setcinull} = userSlice.actions;
 export default userSlice.reducer;

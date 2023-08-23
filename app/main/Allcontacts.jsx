@@ -11,7 +11,7 @@ const Allcontacts = () => {
   return (
     <div className='flex flex-col w-full h-full'>
       <div className='w-full h-10 p-2 flex justify-start items-center'>
-        <div className='cursor-pointer hover:shadow-md p-1 rounded-full' onClick={() => dispatch(toggleCurrent())}>
+        <div className='cursor-pointer hover:shadow-md p-1 rounded-full' onClick={async() => await dispatch(toggleCurrent())}>
           <IoMdArrowRoundBack />
         </div>
       </div>
